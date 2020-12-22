@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
 
-import { Issue } from './issue.entity';
+import { Issue } from '../issue//issue.entity';
 
 @Entity('support_agent')
 export class SupportAgent {

@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToOne, OneToMany, ManyToMany, ManyToOne, JoinColumn } from 'typeorm';
-import { SupportAgent } from './support_agent.entity';
+import { SupportAgent } from '../support_agent/support_agent.entity';
 
 @Entity('issue')
 export class Issue {
