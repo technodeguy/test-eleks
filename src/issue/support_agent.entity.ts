@@ -13,7 +13,7 @@ export class SupportAgent {
   @Column({ type: 'varchar', length: 32 })
   password: string;
 
-  @OneToOne(() => Issue, { onDelete: 'SET NULL' })
+  @OneToOne(() => Issue, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'issue_id' })
   issue: Issue;
 }
