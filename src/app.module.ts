@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import path = require('path');
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { IssueController } from './issue/issue.controller';
 import { IssueService } from './issue/issue.service';
@@ -17,6 +17,7 @@ import { SupportAgent } from './support_agent/support_agent.entity';
       Issue,
       SupportAgent,
     ]),
+    ScheduleModule.forRoot()
   ],
   controllers: [IssueController],
   providers: [IssueService],
