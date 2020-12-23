@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Repository, IsNull, Not } from 'typeorm';
+import { Repository, IsNull, Not, getManager } from 'typeorm';
 
 import { SupportAgent } from 'src/support_agent/support_agent.entity';
 import { CreateIssueResponse, ICreateIssue } from './interfaces';
@@ -44,11 +44,13 @@ export class IssueService {
       const firstFreeAgent = await this.supportAgentRepository.findOne({ issue: IsNull() });
       
       if (firstFreeAgent) {
-        this.logger.log(`Attaching ${firstFreeAgent} to issue ${issueToProcess.id}`);
+        this.logger.log(`Attaching ${firstFreeAgent.email} agent to issue ${issueToProcess.id}`);
         firstFreeAgent.issue = issueToProcess;
         issueToProcess.status = StatusType.PROCESSED;
-        await this.issueRepository.save(issueToProcess);
-        await this.supportAgentRepository.save(firstFreeAgent);
+        await getManager().transaction(async transactionalEntityManager => {
+          await transactionalEntityManager.save(issueToProcess);
+          await transactionalEntityManager.save(firstFreeAgent);
+        });
       }
     }
   }
