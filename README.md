@@ -24,6 +24,12 @@ $ npm run start
 $ npm run start:dev
 ```
 
+## Running e2e tests
+
+```bash
+$ npm run test:e2e
+```
+
 ## Running seeds
 After your server was launched successfully run these queries in your sql shell <br />
 This will insert a temporary support agents into your database <br />
