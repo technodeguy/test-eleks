@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { StatusType } from '../consts';
+import { SupportAgent } from '../support_agent/support_agent.entity';
 
 @Entity('issue')
 export class Issue {
@@ -15,4 +16,7 @@ export class Issue {
 
   @Column({ type: 'int', default: StatusType.NEW })
   status: StatusType;
+
+  @OneToOne(() => SupportAgent, supportAgent => supportAgent.issue)
+  support_agent: SupportAgent;
 }

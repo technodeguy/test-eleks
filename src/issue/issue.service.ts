@@ -1,12 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Repository, IsNull, Not, getManager } from 'typeorm';
+import { Repository, IsNull, getManager } from 'typeorm';
 
-import { SupportAgent } from 'src/support_agent/support_agent.entity';
+import { SupportAgent } from '../support_agent/support_agent.entity';
 import { CreateIssueResponse, ICreateIssue } from './interfaces';
 import { Issue } from './issue.entity';
-import { StatusType } from 'src/consts';
+import { StatusType } from '../consts';
 
 @Injectable()
 export class IssueService {
@@ -20,20 +20,6 @@ export class IssueService {
   ) {
     this.logger = new Logger(IssueService.name);
   }
-
-  // @Cron(CronExpression.EVERY_10_SECONDS)
-  // public async issueResolverCron() {
-  //   const busyAgent = await this.supportAgentRepository.findOne({ where: { issue: Not(IsNull()) }, relations: ['issue'] })
-    
-  //   if (busyAgent && busyAgent.issue) {
-  //     // TODO setup mailService to connect to support agent`s mail and send message to user
-  //     // Resolving issue by agent
-
-  //     await this.issueRepository.update({ id: busyAgent.issue.id }, { is_being_processed: false, is_resolved: true });
-  //     busyAgent.issue = null;
-  //     await this.supportAgentRepository.save(busyAgent)
-  //   }
-  // }
 
   @Cron(CronExpression.EVERY_10_SECONDS)
   public async attachFreeAgentToIssueCron() {
@@ -52,6 +38,32 @@ export class IssueService {
           await transactionalEntityManager.save(firstFreeAgent);
         });
       }
+    }
+  }
+
+  public async resolveIssue(issueId: number, newStatus: StatusType) {
+    const issue = await this.issueRepository.findOne({ where: { id: issueId }, relations: ['support_agent'] });
+
+    this.logger.log(`Issue to be resolved: ${JSON.stringify(issue)}`);
+
+    if (!issue) {
+      this.logger.error(`Issue with id ${issueId} was not found`);
+      throw new NotFoundException(null, 'NO_SUCH_ISSUE');
+    }
+
+    if (issue.status === StatusType.RESOLVED || issue.status === StatusType.REJECTED) {
+      this.logger.warn(`Issue with id ${issue.id} already resolved`);
+      throw new BadRequestException(null, 'ISSUE_ALREADY_RESOLVED');
+    }
+
+    if (issue.support_agent && issue.support_agent.id) {
+      await getManager().transaction(async transactionalEntityManager => {
+        issue.status = newStatus;
+        issue.support_agent.issue = null;
+        await transactionalEntityManager.save(issue);
+        await transactionalEntityManager.save(issue.support_agent);
+        this.logger.log(`Status of issue ${issue.id} was successfully set to ${newStatus}`);
+      });
     }
   }
 
