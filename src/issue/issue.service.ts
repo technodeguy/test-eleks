@@ -62,7 +62,8 @@ export class IssueService {
         issue.support_agent.issue = null;
         await transactionalEntityManager.save(issue);
         await transactionalEntityManager.save(issue.support_agent);
-        this.logger.log(`Status of issue ${issue.id} was successfully set to ${newStatus}`);
+        this.logger.log(`Status of issue ${issue.id} was successfully set to ${newStatus}. Looking for free agents`);
+        this.attachFreeAgentToIssueCron();
       });
     }
   }
