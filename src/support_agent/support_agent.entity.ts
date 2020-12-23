@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 import { Issue } from '../issue//issue.entity';
 
@@ -13,7 +13,7 @@ export class SupportAgent {
   @Column({ type: 'varchar', length: 32 })
   password: string;
 
-  @OneToOne(() => Issue, { onDelete: 'SET NULL', nullable: true })
+  @ManyToOne(() => Issue, { nullable: true })
   @JoinColumn({ name: 'issue_id' })
   issue: Issue;
 }
