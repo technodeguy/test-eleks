@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToOne, OneToMany, ManyToMany, ManyToOne, JoinColumn } from 'typeorm';
-import { SupportAgent } from '../support_agent/support_agent.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
+import { StatusType } from '../consts';
 
 @Entity('issue')
 export class Issue {
@@ -12,13 +13,6 @@ export class Issue {
   @Column({ type: 'varchar', length: 128 })
   message: string;
 
-  @Column({ type: 'int', default: false })
-  is_being_processed: boolean;
-
-  @Column({ type: 'int', default: false })
-  is_resolved: boolean;
-
-  // @ManyToOne(() => SupportAgent, { onDelete: 'CASCADE', nullable: true })
-  // @JoinColumn({ name: 'support_agent_id' })
-  // support_agent: SupportAgent;
+  @Column({ type: 'int', default: StatusType.NEW })
+  status: StatusType;
 }

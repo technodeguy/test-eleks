@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, JoinColumn, OneToOne } from 'typeorm';
 
 import { Issue } from '../issue//issue.entity';
 
@@ -13,7 +13,7 @@ export class SupportAgent {
   @Column({ type: 'varchar', length: 32 })
   password: string;
 
-  @ManyToOne(() => Issue, { nullable: true })
+  @OneToOne(() => Issue, { nullable: true })
   @JoinColumn({ name: 'issue_id' })
   issue: Issue;
 }
